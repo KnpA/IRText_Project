@@ -1,8 +1,5 @@
 
-# coding: utf8
 import glob,random,re,math
-
-
 
 
 
@@ -38,11 +35,11 @@ def Main():
         t_moy = []
         for filename in Paquet2File[i+1]:
             Scores = {}
-            """
+            
             content=LireFichier(filename)
             tokens = Tokenize(content)
             #tokens = StopList(tokens)
-            
+            """
             for word in tokens:
                 for comp_doc in glob.iglob('./txt/*.txt'):
                     if comp_doc not in Paquet2File[i+1]:
@@ -50,16 +47,23 @@ def Main():
                             Scores[comp_doc]=0
                         #Scores[comp_doc]+=((Word2IDF[word] ) * ListesInverse[word][comp_doc] * Word2IDF[word] ) / math.sqrt(File2Norme[comp_doc])  
             """
-            for word in ListesInverse:
+            words = []
+            for word in tokens:
+                if not word in words:
+                    words.append(word)
+            print("Removed doblons")
+            
+            for word in words:
                 for comp_doc in glob.iglob('./txt/*.txt'):
                         if comp_doc not in Paquet2File[i+1]:
                             if comp_doc not in Scores:
                                 Scores[comp_doc]=0
-                                if comp_doc in ListesInverse[word] and filename in ListesInverse[word] :
+                                if comp_doc in ListesInverse[word]:
                                     cos = ((ListesInverse[word][filename] * Word2IDF[word] ) * (ListesInverse[word][comp_doc] * Word2IDF[word]) ) 
                                     cos = cos / float( math.sqrt(File2Norme[comp_doc]))
                                     Scores[comp_doc]+= cos
-            Winner = "./txt\zola4.txt"
+                                
+            Winner = None
             for doc in Scores:
                 if not Winner:
                     Winner = doc
@@ -67,8 +71,10 @@ def Main():
                     Winner = doc
             if File2Author[Winner] == File2Author[filename]:
                 OK += 1
+                print "OK, wanted " + File2Author[Winner]
             else:
                 pasOK += 1
+                print "KO, wanted " + File2Author[filename] + " , got " + File2Author[Winner]
             prec = OK / float(OK + pasOK)
             
             print "Just tested " + filename
@@ -83,25 +89,26 @@ def LireFichier(filename):
         res = res + line
     return res
 
-content = u"àéèêâôùû a-t-il Test de découpage du texte lu, avec même des virgules et des caractères spéciaux et tout maggle ! TKT; c'est trop cool..."
-
-# Découpage du fichier lu en tableau
+# Decoupage du fichier lu en tableau
 def Tokenize(content):
+    #content = unicode(content, 'iso-8859-1')
     content = content.lower()
     content = re.sub('[\-]{2,}', "", content)
-    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content) 
-    #content=unicode(content, 'utf-8')    
+
+    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content)
     res = content.split()
     return res
     
 def StopList(tokens):
     sentence = tokens
     remove_list=LireFichier('stop_word.html')
-    #remove_list=unicode(remove_list, 'utf-8')
+    #remove_list=unicode(remove_list, 'iso-8859-1')
     remove_list=remove_list.split()
 
     res=[]
     for word in sentence:
+        #if word in remove_list :
+            #print word+' retire'
         if word not in remove_list :
             res.append(word)
 
