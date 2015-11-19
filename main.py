@@ -6,21 +6,29 @@ def Main():
     #lecture de tous les fichiers et constitution des paquets 
     ListesInverse={}
     File2Author = {}
+    NbPaquet = 10
     File2Paquet = {}
+    Paquet2File = {}
+    File2Norme = {}
     DocCount=0
     for filename in glob.iglob('./txt/*.txt'):
         author = filename.split("\\")[1]
         author = author.split(".txt")[0]
         author = author[:-1]
         File2Author[filename]=author
-        paquet = random.randint(1,10)
+        paquet = random.randint(1,NbPaquet)
         File2Paquet[filename]=paquet
+        if not paquet in Paquet2File:
+            Paquet2File[paquet] = []
+        Paquet2File[paquet].append(filename)
         content=LireFichier(filename)
         tokens = Tokenize(content)
         #tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
     InverseDocumentFrequency(ListesInverse, DocCount)
+    File2Norme = Norme(ListesInverse)
+    
     #print ListesInverse
 
 def LireFichier(filename):
@@ -36,7 +44,7 @@ def Tokenize(content):
     content = content.lower()
     content = re.sub('[\-]{2,}', "", content)
     content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content) 
-	#content=unicode(content, 'utf-8')	
+    #content=unicode(content, 'utf-8')    
     res = content.split()
     return res
     
@@ -79,9 +87,14 @@ def InverseDocumentFrequency(ListesInverse, DocCount):
     print "Inverse document frequency done"
     return ListesInverse
 
-def Ponderation(tokens):
-    res={}
-    return res
+def Norme(ListesInverse):
+    File2Norme={}
+    for word in ListesInverse:
+        for filename in ListesInverse[word]:
+            if not filename in File2Norme:
+                File2Norme[filename] = 0
+            File2Norme[filename] += ListesInverse[word][filename] ** 2
+    return File2Norme
 
 if __name__ == '__main__':
     Main()
