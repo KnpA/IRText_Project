@@ -12,12 +12,14 @@ def Main():
         author = author.split(".txt")[0]
         author = author[:-1]
         File2Author[filename]=author
-        File2Paquet[filename]=random.randint(1,11)
+        File2Paquet[filename]=random.randint(1,10)
         content=LireFichier(filename)
         tokens = Tokenize(content)
+        ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         
         
-    print File2Paquet
+        
+    print ListesInverse
 
 def LireFichier(filename):
     res=""
@@ -38,9 +40,21 @@ def StopList(tokens):
     res=[]
     return res
 
-def TermFrequency(tokens):
-    res={}
-    return res
+def TermFrequency(tokens,ListesInverse,filename):
+    ListesInverse=ListesInverse    
+    diffwordcount=0
+    for word in tokens:
+            if not word in ListesInverse:
+                ListesInverse[word] = {}
+            if not filename in ListesInverse[word]:
+                diffwordcount+=1
+                ListesInverse[word][filename] = 0
+            ListesInverse[word][filename]+=1
+    for word in ListesInverse:
+        if filename in ListesInverse[word]:
+            ListesInverse[word][filename] = ListesInverse[word][filename]/float(diffwordcount)
+    print "Term frequency done for "+filename+" Diffwords : "+str(diffwordcount)
+    return ListesInverse
 
 def InverseDocumentFrequency(keyword):
     res=0
