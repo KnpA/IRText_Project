@@ -2,6 +2,10 @@
 # coding: utf8
 import glob,random,re,math
 
+
+
+
+
 def Main():
     #lecture de tous les fichiers et constitution des paquets 
     ListesInverse={}
@@ -10,6 +14,7 @@ def Main():
     File2Paquet = {}
     Paquet2File = {}
     File2Norme = {}
+    Word2IDF = {}
     DocCount=0
     for filename in glob.iglob('./txt/*.txt'):
         author = filename.split("\\")[1]
@@ -26,10 +31,51 @@ def Main():
         #tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
-    InverseDocumentFrequency(ListesInverse, DocCount)
-    File2Norme = Norme(ListesInverse)
-    
-    #print ListesInverse
+    Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
+    File2Norme = Norme(ListesInverse,Word2IDF)
+    for i in range(NbPaquet):
+        OK, pasOK = 0, 0       
+        t_moy = []
+        for filename in Paquet2File[i+1]:
+            Scores = {}
+            """
+            content=LireFichier(filename)
+            tokens = Tokenize(content)
+            #tokens = StopList(tokens)
+            
+            for word in tokens:
+                for comp_doc in glob.iglob('./txt/*.txt'):
+                    if comp_doc not in Paquet2File[i+1]:
+                        if comp_doc not in Scores:
+                            Scores[comp_doc]=0
+                        #Scores[comp_doc]+=((Word2IDF[word] ) * ListesInverse[word][comp_doc] * Word2IDF[word] ) / math.sqrt(File2Norme[comp_doc])  
+            """
+            for word in ListesInverse:
+                for comp_doc in glob.iglob('./txt/*.txt'):
+                        if comp_doc not in Paquet2File[i+1]:
+                            if comp_doc not in Scores:
+                                Scores[comp_doc]=0
+                                if comp_doc in ListesInverse[word] and filename in ListesInverse[word] :
+                                    cos = ((ListesInverse[word][filename] * Word2IDF[word] ) * (ListesInverse[word][comp_doc] * Word2IDF[word]) ) 
+                                    cos = cos / float( math.sqrt(File2Norme[comp_doc]))
+                                    Scores[comp_doc]+= cos
+            Winner = "./txt\zola4.txt"
+            for doc in Scores:
+                if not Winner:
+                    Winner = doc
+                if Scores[doc] > Scores[Winner]:
+                    Winner = doc
+            if File2Author[Winner] == File2Author[filename]:
+                OK += 1
+            else:
+                pasOK += 1
+            prec = OK / float(OK + pasOK)
+            
+            print "Just tested " + filename
+        t_moy.append(prec)
+        print "Just tested paquet" + str(i+1) + " with prec = "+ str(prec)
+    pmoy= sum(t_moy)/float(len(t_moy))
+    print pmoy
 
 def LireFichier(filename):
     res=""
@@ -79,21 +125,19 @@ def TermFrequency(tokens,ListesInverse,filename):
 
 def InverseDocumentFrequency(ListesInverse, DocCount):
     ListesInverse=ListesInverse
+    Word2IDF = {}
     for word in ListesInverse:
-        idf = math.log(DocCount/float(len(ListesInverse[word])))
-        #print word + " : " + str(idf) 
-        for filename in ListesInverse[word]:
-            ListesInverse[word][filename]=idf*ListesInverse[word][filename]
+        Word2IDF[word] = math.log(DocCount/float(len(ListesInverse[word])))
     print "Inverse document frequency done"
-    return ListesInverse
+    return Word2IDF
 
-def Norme(ListesInverse):
+def Norme(ListesInverse,Word2IDF):
     File2Norme={}
     for word in ListesInverse:
         for filename in ListesInverse[word]:
             if not filename in File2Norme:
                 File2Norme[filename] = 0
-            File2Norme[filename] += ListesInverse[word][filename] ** 2
+            File2Norme[filename] += (ListesInverse[word][filename] * Word2IDF[word]) ** 2
     return File2Norme
 
 if __name__ == '__main__':
