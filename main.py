@@ -1,5 +1,4 @@
 
-# coding: utf8
 import glob,random,re,math
 
 def Main():
@@ -17,7 +16,7 @@ def Main():
         File2Paquet[filename]=paquet
         content=LireFichier(filename)
         tokens = Tokenize(content)
-        #tokens = StopList(tokens)
+        tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
     InverseDocumentFrequency(ListesInverse, DocCount)
@@ -29,25 +28,25 @@ def LireFichier(filename):
         res = res + line
     return res
 
-content = u"àéèêâôùû a-t-il Test de découpage du texte lu, avec même des virgules et des caractères spéciaux et tout maggle ! TKT; c'est trop cool..."
-
 # Découpage du fichier lu en tableau
 def Tokenize(content):
+    #content = unicode(content, 'iso-8859-1')
     content = content.lower()
     content = re.sub('[\-]{2,}', "", content)
-    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content) 
-	#content=unicode(content, 'utf-8')	
+    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content)
     res = content.split()
     return res
     
 def StopList(tokens):
     sentence = tokens
     remove_list=LireFichier('stop_word.html')
-    #remove_list=unicode(remove_list, 'utf-8')
+    #remove_list=unicode(remove_list, 'iso-8859-1')
     remove_list=remove_list.split()
 
     res=[]
     for word in sentence:
+        #if word in remove_list :
+            #print word+' retiré'
         if word not in remove_list :
             res.append(word)
 
