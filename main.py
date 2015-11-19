@@ -1,21 +1,25 @@
 
 # coding: utf8
-import glob,random,re
+import glob,random,re,math
 
 def Main():
     #lecture de tous les fichiers et constitution des paquets 
     ListesInverse={}
     File2Author = {}
     File2Paquet = {}
+    DocCount=0
     for filename in glob.iglob('./txt/*.txt'):
         author = filename.split("\\")[1]
         author = author.split(".txt")[0]
         author = author[:-1]
         File2Author[filename]=author
-        File2Paquet[filename]=random.randint(1,10)
+        paquet = random.randint(1,10)
+        File2Paquet[filename]=paquet
         content=LireFichier(filename)
         tokens = Tokenize(content)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
+        DocCount+=1
+    InverseDocumentFrequency(ListesInverse, DocCount)
     print ListesInverse
 
 def LireFichier(filename):
@@ -48,15 +52,21 @@ def TermFrequency(tokens,ListesInverse,filename):
                 diffwordcount+=1
                 ListesInverse[word][filename] = 0
             ListesInverse[word][filename]+=1
-    for word in ListesInverse:
+    for word in ListesInverse:#normalization
         if filename in ListesInverse[word]:
             ListesInverse[word][filename] = ListesInverse[word][filename]/float(diffwordcount)
     print "Term frequency done for "+filename+" Diffwords : "+str(diffwordcount)
     return ListesInverse
 
-def InverseDocumentFrequency(keyword):
-    res=0
-    return res
+def InverseDocumentFrequency(ListesInverse, DocCount):
+    ListesInverse=ListesInverse
+    for word in ListesInverse:
+        idf = math.log(DocCount/float(len(ListesInverse[word])))
+        #print word + " : " + str(idf) 
+        for filename in ListesInverse[word]:
+            ListesInverse[word][filename]=idf*ListesInverse[word][filename]
+    print "Inverse document frequency done"
+    return ListesInverse
 
 def Ponderation(tokens):
     res={}
