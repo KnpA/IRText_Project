@@ -12,12 +12,11 @@ def Main():
         author = author.split(".txt")[0]
         author = author[:-1]
         File2Author[filename]=author
-        File2Paquet[filename]=random.randint(1,11)
+        File2Paquet[filename]=random.randint(1,10)
         content=LireFichier(filename)
         tokens = Tokenize(content)
-        
-        
-    print File2Paquet
+        ListesInverse = TermFrequency(tokens,ListesInverse,filename)
+    print ListesInverse
 
 def LireFichier(filename):
     res=""
@@ -25,38 +24,44 @@ def LireFichier(filename):
         res = res + line
     return res
 
-content = u"àéèêâôùû Test de découpage du texte lu, avec même des virgules et des caractères spéciaux et tout maggle ! TKT; c'est trop cool..."
+content = u"àéèêâôùû a-t-il Test de découpage du texte lu, avec même des virgules et des caractères spéciaux et tout maggle ! TKT; c'est trop cool..."
 
 # Découpage du fichier lu en tableau
 def Tokenize(content):
     content = content.lower()
-    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\' ]',r'',content)    
+    content = re.sub('[\-{2,}]', "", content)
+    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content)    
     res = content.split()
-    return res
-
-def TermFrequency(tokens):
-    res={}
     return res
     
 def StopList(tokens):
     sentence = tokens
-    #fh  = open('stop_word.txt', 'r')
     remove_list=LireFichier('stop_word.html')
     remove_list=unicode(remove_list, 'utf-8')
     remove_list=remove_list.split()
-    print remove_list
-        
-    #remove_list = ['word1', 'word2']
-    #word_list = sentence.split()
-    #' '.join([i for i in word_list if i not in remove_list])
+
     res=[]
     for word in sentence:
-        print word+' mot '
         if word not in remove_list :
-            print word+' pas dans la liste\n'
             res.append(word)
-    #print (res);
+
     return res
+
+def TermFrequency(tokens,ListesInverse,filename):
+    ListesInverse=ListesInverse    
+    diffwordcount=0
+    for word in tokens:
+            if not word in ListesInverse:
+                ListesInverse[word] = {}
+            if not filename in ListesInverse[word]:
+                diffwordcount+=1
+                ListesInverse[word][filename] = 0
+            ListesInverse[word][filename]+=1
+    for word in ListesInverse:
+        if filename in ListesInverse[word]:
+            ListesInverse[word][filename] = ListesInverse[word][filename]/float(diffwordcount)
+    print "Term frequency done for "+filename+" Diffwords : "+str(diffwordcount)
+    return ListesInverse
 
 def InverseDocumentFrequency(keyword):
     res=0
@@ -70,4 +75,3 @@ def Ponderation(tokens):
 
 if __name__ == '__main__':
     Main()
-
