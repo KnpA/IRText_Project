@@ -2,6 +2,24 @@
 # coding: utf8
 import glob,random,re
 
+"""
+for i in range (NbPaquet):
+    OK, pasOK = 0, 0
+    for doc in le_paquetZfile[i]:
+        calcul cosinus de doc VS tous les autes docs
+        garder les k premiers qui ne sont pas dans i
+        auteur majoritaire bon -> OK + = 1
+        sinon pasOK + = 1
+        prec = ok / (ok + pasOK)
+        t_moy.append(prec)
+    pmoy= sum(t_moy)/len(t_moy)
+"""
+
+
+
+
+
+
 def Main():
     #lecture de tous les fichiers et constitution des paquets 
     ListesInverse={}
