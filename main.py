@@ -16,7 +16,6 @@ def Main():
         content=LireFichier(filename)
         tokens = Tokenize(content)
         
-        
     print File2Paquet
 
 def LireFichier(filename):
@@ -25,12 +24,13 @@ def LireFichier(filename):
         res = res + line
     return res
 
-content = u"àéèêâôùû Test de découpage du texte lu, avec même des virgules et des caractères spéciaux et tout maggle ! TKT; c'est trop cool..."
+content = u"àéèêâôùû a-t-il Test de découpage du texte lu, avec même des virgules et des caractères spéciaux et tout maggle ! TKT; c'est trop cool..."
 
 # Découpage du fichier lu en tableau
 def Tokenize(content):
     content = content.lower()
-    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\' ]',r'',content)    
+    content = re.sub('[\-{2,}]', "", content)
+    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content)    
     res = content.split()
     return res
 
