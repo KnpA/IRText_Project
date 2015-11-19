@@ -17,10 +17,11 @@ def Main():
         File2Paquet[filename]=paquet
         content=LireFichier(filename)
         tokens = Tokenize(content)
+        #tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
     InverseDocumentFrequency(ListesInverse, DocCount)
-    print ListesInverse
+    #print ListesInverse
 
 def LireFichier(filename):
     res=""
@@ -33,13 +34,23 @@ content = u"àéèêâôùû a-t-il Test de découpage du texte lu, avec même d
 # Découpage du fichier lu en tableau
 def Tokenize(content):
     content = content.lower()
-    content = re.sub('[\-{2,}]', "", content)
-    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content)    
+    content = re.sub('[\-]{2,}', "", content)
+    content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content) 
+	#content=unicode(content, 'utf-8')	
     res = content.split()
     return res
-
+    
 def StopList(tokens):
+    sentence = tokens
+    remove_list=LireFichier('stop_word.html')
+    #remove_list=unicode(remove_list, 'utf-8')
+    remove_list=remove_list.split()
+
     res=[]
+    for word in sentence:
+        if word not in remove_list :
+            res.append(word)
+
     return res
 
 def TermFrequency(tokens,ListesInverse,filename):
@@ -72,8 +83,5 @@ def Ponderation(tokens):
     res={}
     return res
 
-
-
 if __name__ == '__main__':
     Main()
-
