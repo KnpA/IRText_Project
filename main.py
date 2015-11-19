@@ -34,12 +34,28 @@ def Tokenize(content):
     res = content.split()
     return res
 
-def StopList(tokens):
-    res=[]
-    return res
-
 def TermFrequency(tokens):
     res={}
+    return res
+    
+def StopList(tokens):
+    sentence = tokens
+    #fh  = open('stop_word.txt', 'r')
+    remove_list=LireFichier('stop_word.html')
+    remove_list=unicode(remove_list, 'utf-8')
+    remove_list=remove_list.split()
+    print remove_list
+        
+    #remove_list = ['word1', 'word2']
+    #word_list = sentence.split()
+    #' '.join([i for i in word_list if i not in remove_list])
+    res=[]
+    for word in sentence:
+        print word+' mot '
+        if word not in remove_list :
+            print word+' pas dans la liste\n'
+            res.append(word)
+    #print (res);
     return res
 
 def InverseDocumentFrequency(keyword):
