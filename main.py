@@ -7,7 +7,7 @@ def Main():
     #lecture de tous les fichiers et constitution des paquets 
     ListesInverse={}
     File2Author = {}
-    NbPaquet = 10
+    NbPaquet = 20
     File2Paquet = {}
     Paquet2File = {}
     File2Norme = {}
@@ -25,7 +25,7 @@ def Main():
         Paquet2File[paquet].append(filename)
         content=LireFichier(filename)
         tokens = Tokenize(content)
-        #tokens = StopList(tokens)
+        tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
     Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
@@ -38,7 +38,7 @@ def Main():
             Scores = {}            
             content=LireFichier(filename)
             tokens = Tokenize(content)
-            #tokens = StopList(tokens)
+            tokens = StopList(tokens)
             words = {}
             for word in tokens:
                 words[word]=1
@@ -71,7 +71,7 @@ def Main():
             print "Just tested " + filename
         t_moy+=prec
         pmoy=t_moy/float(i+1)
-        print "___Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(pmoy,2)) + ")"
+        print "_ _ _ Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(pmoy,2)) + ") _ _ _"
     pmoy= t_moy/float(NbPaquet)
     print "Average precision for all paquets :" + str(round(pmoy,3))
 
@@ -93,7 +93,7 @@ def Tokenize(content):
     
 def StopList(tokens):
     sentence = tokens
-    remove_list=LireFichier('stop_word.html')
+    remove_list=LireFichier('short_stop_word.html')
     #remove_list=unicode(remove_list, 'iso-8859-1')
     remove_list=remove_list.split()
 
