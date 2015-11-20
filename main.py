@@ -70,7 +70,7 @@ def Main():
             
             print "Just tested " + filename
         t_moy.append(prec)
-        print "Just tested paquet" + str(i+1) + " with prec = "+ str(prec)
+        print "_ _ _ Just tested paquet " + str(i+1) + " with prec = "+ str(prec)+" _ _ _ \n\n"
     pmoy= sum(t_moy)/float(len(t_moy))
     print "Average precision for all paquets :" + str(pmoy)
 
