@@ -30,7 +30,7 @@ def Main():
         DocCount+=1
     Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
     File2Norme = Norme(ListesInverse,Word2IDF)
-    #validation croisée par calcul du cosinus
+    #validation croisee par calcul du cosinus
     for i in range(NbPaquet):
         OK, pasOK = 0, 0       
         t_moy = []
