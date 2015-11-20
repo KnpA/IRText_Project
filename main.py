@@ -72,7 +72,7 @@ def Main():
         t_moy.append(prec)
         print "Just tested paquet" + str(i+1) + " with prec = "+ str(prec)
     pmoy= sum(t_moy)/float(len(t_moy))
-    print "Average precision for all paquets :" + pmoy
+    print "Average precision for all paquets :" + str(pmoy)
 
 def LireFichier(filename):
     res=""
