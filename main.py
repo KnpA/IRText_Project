@@ -30,38 +30,29 @@ def Main():
         DocCount+=1
     Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
     File2Norme = Norme(ListesInverse,Word2IDF)
+    #validation croisée par calcul du cosinus
     for i in range(NbPaquet):
         OK, pasOK = 0, 0       
         t_moy = []
         for filename in Paquet2File[i+1]:
-            Scores = {}
-            
+            Scores = {}            
             content=LireFichier(filename)
             tokens = Tokenize(content)
             #tokens = StopList(tokens)
-            """
+            words = {}
             for word in tokens:
-                for comp_doc in glob.iglob('./txt/*.txt'):
-                    if comp_doc not in Paquet2File[i+1]:
-                        if comp_doc not in Scores:
-                            Scores[comp_doc]=0
-                        #Scores[comp_doc]+=((Word2IDF[word] ) * ListesInverse[word][comp_doc] * Word2IDF[word] ) / math.sqrt(File2Norme[comp_doc])  
-            """
-            words = []
-            for word in tokens:
-                if not word in words:
-                    words.append(word)
-            print("Removed doblons")
-            
+                words[word]=1
+            #print("Removed doblons")            
             for word in words:
-                for comp_doc in glob.iglob('./txt/*.txt'):
-                        if comp_doc not in Paquet2File[i+1]:
+                for comp_doc in File2Author:
+                    if comp_doc not in Paquet2File[i+1]:                            
+                        if comp_doc in ListesInverse[word]:
                             if comp_doc not in Scores:
                                 Scores[comp_doc]=0
-                                if comp_doc in ListesInverse[word]:
-                                    cos = ((ListesInverse[word][filename] * Word2IDF[word] ) * (ListesInverse[word][comp_doc] * Word2IDF[word]) ) 
-                                    cos = cos / float( math.sqrt(File2Norme[comp_doc]))
-                                    Scores[comp_doc]+= cos
+                            #calcul du cosinus
+                            cos = ((ListesInverse[word][filename] * Word2IDF[word] ) * (ListesInverse[word][comp_doc] * Word2IDF[word]) ) 
+                            cos = cos / float( math.sqrt(File2Norme[comp_doc]))
+                            Scores[comp_doc]+= cos
                                 
             Winner = None
             for doc in Scores:
@@ -81,7 +72,7 @@ def Main():
         t_moy.append(prec)
         print "Just tested paquet" + str(i+1) + " with prec = "+ str(prec)
     pmoy= sum(t_moy)/float(len(t_moy))
-    print pmoy
+    print "Average precision for all paquets :" + pmoy
 
 def LireFichier(filename):
     res=""
@@ -145,6 +136,7 @@ def Norme(ListesInverse,Word2IDF):
             if not filename in File2Norme:
                 File2Norme[filename] = 0
             File2Norme[filename] += (ListesInverse[word][filename] * Word2IDF[word]) ** 2
+    #print File2Norme
     return File2Norme
 
 if __name__ == '__main__':
