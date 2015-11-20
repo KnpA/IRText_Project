@@ -31,9 +31,9 @@ def Main():
     Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
     File2Norme = Norme(ListesInverse,Word2IDF)
     #validation croisee par calcul du cosinus
+    t_moy = 0
     for i in range(NbPaquet):
-        OK, pasOK = 0, 0       
-        t_moy = []
+        OK, pasOK = 0, 0      
         for filename in Paquet2File[i+1]:
             Scores = {}            
             content=LireFichier(filename)
@@ -69,10 +69,11 @@ def Main():
             prec = OK / float(OK + pasOK)
             
             print "Just tested " + filename
-        t_moy.append(prec)
-        print "_ _ _ Just tested paquet " + str(i+1) + " with prec = "+ str(prec)+" _ _ _ \n\n"
-    pmoy= sum(t_moy)/float(len(t_moy))
-    print "Average precision for all paquets :" + str(pmoy)
+        t_moy+=prec
+        pmoy=t_moy/float(i+1)
+        print "___Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(pmoy,2)) + ")"
+    pmoy= t_moy/float(NbPaquet)
+    print "Average precision for all paquets :" + str(round(pmoy,3))
 
 def LireFichier(filename):
     res=""
