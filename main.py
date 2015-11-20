@@ -7,7 +7,7 @@ def Main():
     #lecture de tous les fichiers et constitution des paquets 
     ListesInverse={}
     File2Author = {}
-    NbPaquet = 10
+    NbPaquet = 20
     File2Paquet = {}
     Paquet2File = {}
     File2Norme = {}
@@ -25,7 +25,7 @@ def Main():
         Paquet2File[paquet].append(filename)
         content=LireFichier(filename)
         tokens = Tokenize(content)
-        #tokens = StopList(tokens)
+        tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
     Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
@@ -38,7 +38,7 @@ def Main():
             Scores = {}            
             content=LireFichier(filename)
             tokens = Tokenize(content)
-            #tokens = StopList(tokens)
+            tokens = StopList(tokens)
             words = {}
             for word in tokens:
                 words[word]=1
