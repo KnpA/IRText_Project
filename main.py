@@ -33,9 +33,12 @@ def Main():
     #validation croisee par calcul du cosinus
     t_moy = 0
     cpt = 0
+    totaltested = 0
+    totalcorrect = 0
     for i in range(NbPaquet):
         OK, pasOK = 0, 0      
         for filename in Paquet2File[i+1]:
+            totaltested += 1
             Scores = {}            
             content=LireFichier(filename)
             tokens = Tokenize(content)
@@ -72,6 +75,7 @@ def Main():
             w = it.next()
             Winner = w[0]
             if File2Author[Winner] == File2Author[filename]:
+                totalcorrect += 1
                 OK += 1
                 print "OK, wanted " + File2Author[Winner]
             else:
@@ -83,9 +87,10 @@ def Main():
 
         cpt += 1
         pmoy=t_moy/float(cpt)
-        print "_ _ _ Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(pmoy,2)) + ")"
+        print "_ _ _ Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(totalcorrect / float(totaltested),2)) + ")"
     pmoy= t_moy/float(NbPaquet)
     print "Average precision for all paquets :" + str(round(pmoy,3))
+    print "Average precision for all texts :" + str(round(totalcorrect / float(totaltested),3))
 
 def LireFichier(filename):
     res=""
