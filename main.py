@@ -80,9 +80,10 @@ def Main():
             prec = OK / float(OK + pasOK)
             print "Just tested " + filename
         t_moy+=prec
+
         cpt += 1
         pmoy=t_moy/float(cpt)
-        print "___Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(pmoy,2)) + ")"
+        print "_ _ _ Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(pmoy,2)) + ")"
     pmoy= t_moy/float(NbPaquet)
     print "Average precision for all paquets :" + str(round(pmoy,3))
 
