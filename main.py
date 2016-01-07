@@ -1,5 +1,5 @@
 
-import glob,random,re,math
+import glob,random,re,math,operator
 
 
 
@@ -25,20 +25,21 @@ def Main():
         Paquet2File[paquet].append(filename)
         content=LireFichier(filename)
         tokens = Tokenize(content)
-        tokens = StopList(tokens)
+        #tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
     Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
     File2Norme = Norme(ListesInverse,Word2IDF)
     #validation croisee par calcul du cosinus
     t_moy = 0
+    cpt = 0
     for i in range(NbPaquet):
         OK, pasOK = 0, 0      
         for filename in Paquet2File[i+1]:
             Scores = {}            
             content=LireFichier(filename)
             tokens = Tokenize(content)
-            tokens = StopList(tokens)
+            #tokens = StopList(tokens)
             words = {}
             for word in tokens:
                 words[word]=1
@@ -54,23 +55,33 @@ def Main():
                             cos = cos / float( math.sqrt(File2Norme[comp_doc]))
                             Scores[comp_doc]+= cos
                                 
-            Winner = None
-            for doc in Scores:
-                if not Winner:
-                    Winner = doc
-                if Scores[doc] > Scores[Winner]:
-                    Winner = doc
+            Winners = {}
+            #classement des scores pour chaque texte
+            SortedScores = sorted(Scores.items(), key=operator.itemgetter(1), reverse=True)
+            NN = 3
+            it = iter(SortedScores)
+            #prise en compte des NN plus proches voisins
+            for i in range(NN):
+                score  = it.next()
+                a = File2Author[score[0]]
+                if not a in Winners:
+                    Winners[a] = 0
+                Winners[a] += 1
+            SortedWinners = sorted(Scores.items(), key=operator.itemgetter(1),reverse=True)
+            it = iter(SortedWinners)
+            w = it.next()
+            Winner = w[0]
             if File2Author[Winner] == File2Author[filename]:
                 OK += 1
                 print "OK, wanted " + File2Author[Winner]
             else:
                 pasOK += 1
-                print "KO, wanted " + File2Author[filename] + " , got " + File2Author[Winner]
+                print "KO, wanted " + File2Author[filename] + " , got " + File2Author[Winner] + ""
             prec = OK / float(OK + pasOK)
-            
             print "Just tested " + filename
         t_moy+=prec
-        pmoy=t_moy/float(i+1)
+        cpt += 1
+        pmoy=t_moy/float(cpt)
         print "___Just tested paquet" + str(i+1) + " with prec = "+ str(round(prec,2)) + " (current avg prec = " + str(round(pmoy,2)) + ")"
     pmoy= t_moy/float(NbPaquet)
     print "Average precision for all paquets :" + str(round(pmoy,3))
@@ -93,7 +104,7 @@ def Tokenize(content):
     
 def StopList(tokens):
     sentence = tokens
-    remove_list=LireFichier('stop_word.html')
+    remove_list=LireFichier('short_stop_word.html')
     #remove_list=unicode(remove_list, 'iso-8859-1')
     remove_list=remove_list.split()
 
