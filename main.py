@@ -5,9 +5,14 @@ import glob,random,re,math,operator
 
 def Main():
     #lecture de tous les fichiers et constitution des paquets 
+    #<Variables de configuration>
+    NbPaquet = 20
+    useStopList = False
+    useIDF = False
+    KNN = 3
+    #</Variables de configuration>
     ListesInverse={}
     File2Author = {}
-    NbPaquet = 20
     File2Paquet = {}
     Paquet2File = {}
     File2Norme = {}
@@ -25,11 +30,13 @@ def Main():
         Paquet2File[paquet].append(filename)
         content=LireFichier(filename)
         tokens = Tokenize(content)
-        #tokens = StopList(tokens)
+        if useStopList:
+            tokens = StopList(tokens)
         ListesInverse = TermFrequency(tokens,ListesInverse,filename)
         DocCount+=1
-    Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
-    File2Norme = Norme(ListesInverse,Word2IDF)
+    if useIDF:
+        Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
+    File2Norme = Norme(ListesInverse,Word2IDF,useIDF)
     #validation croisee par calcul du cosinus
     t_moy = 0
     cpt = 0
@@ -42,7 +49,8 @@ def Main():
             Scores = {}            
             content=LireFichier(filename)
             tokens = Tokenize(content)
-            #tokens = StopList(tokens)
+            if useStopList:
+                tokens = StopList(tokens)
             words = {}
             for word in tokens:
                 words[word]=1
@@ -54,17 +62,19 @@ def Main():
                             if comp_doc not in Scores:
                                 Scores[comp_doc]=0
                             #calcul du cosinus
-                            cos = ((ListesInverse[word][filename] * Word2IDF[word] ) * (ListesInverse[word][comp_doc] * Word2IDF[word]) ) 
+                            if useIDF:
+                                cos = ((ListesInverse[word][filename] * Word2IDF[word] ) * (ListesInverse[word][comp_doc] * Word2IDF[word]) ) 
+                            else:
+                                cos = 1
                             cos = cos / float( math.sqrt(File2Norme[comp_doc]))
                             Scores[comp_doc]+= cos
                                 
             Winners = {}
             #classement des scores pour chaque texte
             SortedScores = sorted(Scores.items(), key=operator.itemgetter(1), reverse=True)
-            NN = 3
             it = iter(SortedScores)
             #prise en compte des NN plus proches voisins
-            for i in range(NN):
+            for i in range(KNN):
                 score  = it.next()
                 a = File2Author[score[0]]
                 if not a in Winners:
@@ -147,14 +157,16 @@ def InverseDocumentFrequency(ListesInverse, DocCount):
     print "Inverse document frequency done"
     return Word2IDF
 
-def Norme(ListesInverse,Word2IDF):
+def Norme(ListesInverse,Word2IDF,useIDF):
     File2Norme={}
     for word in ListesInverse:
         for filename in ListesInverse[word]:
             if not filename in File2Norme:
                 File2Norme[filename] = 0
-            File2Norme[filename] += (ListesInverse[word][filename] * Word2IDF[word]) ** 2
-    #print File2Norme
+            if useIDF :
+                File2Norme[filename] += (ListesInverse[word][filename] * Word2IDF[word]) ** 2
+            else :
+                File2Norme[filename] += (ListesInverse[word][filename]) ** 2
     return File2Norme
 
 if __name__ == '__main__':
