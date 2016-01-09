@@ -9,6 +9,7 @@ def Main():
     NbPaquet = 20
     useStopList = False
     useIDF = False
+    useNorme = True
     KNN = 3
     #</Variables de configuration>
     ListesInverse={}
@@ -18,6 +19,7 @@ def Main():
     File2Norme = {}
     Word2IDF = {}
     DocCount=0
+    #chargement et analyse des textes
     for filename in glob.iglob('./txt/*.txt'):
         author = filename.split("\\")[1]
         author = author.split(".txt")[0]
@@ -37,7 +39,7 @@ def Main():
     if useIDF:
         Word2IDF = InverseDocumentFrequency(ListesInverse, DocCount)
     File2Norme = Norme(ListesInverse,Word2IDF,useIDF)
-    #validation croisee par calcul du cosinus
+    #Attribution des auteurs par validation croisee avec calcul du cosinus
     t_moy = 0
     cpt = 0
     totaltested = 0
@@ -65,15 +67,16 @@ def Main():
                             if useIDF:
                                 cos = ((ListesInverse[word][filename] * Word2IDF[word] ) * (ListesInverse[word][comp_doc] * Word2IDF[word]) ) 
                             else:
-                                cos = 1
-                            cos = cos / float( math.sqrt(File2Norme[comp_doc]))
+                                cos = ListesInverse[word][filename] * ListesInverse[word][comp_doc]
+                            if useNorme:
+                                cos = cos / float( math.sqrt(File2Norme[comp_doc]))
                             Scores[comp_doc]+= cos
                                 
             Winners = {}
             #classement des scores pour chaque texte
             SortedScores = sorted(Scores.items(), key=operator.itemgetter(1), reverse=True)
             it = iter(SortedScores)
-            #prise en compte des NN plus proches voisins
+            #prise en compte des K plus proches voisins
             for i in range(KNN):
                 score  = it.next()
                 a = File2Author[score[0]]
@@ -102,6 +105,7 @@ def Main():
     print "Average precision for all paquets :" + str(round(pmoy,3))
     print "Average precision for all texts :" + str(round(totalcorrect / float(totaltested),3))
 
+#Lecture d'un fichier et restitution sous forme de string
 def LireFichier(filename):
     res=""
     for line in open(filename):
@@ -117,7 +121,8 @@ def Tokenize(content):
     content = re.sub(r'[^a-zA-Z\xe0\xe9\xe8\xea\xe2\xf4\xf9\xfb\-\' ]',r'',content)
     res = content.split()
     return res
-    
+
+#Suppression des mots outils d'un texte via une stop list
 def StopList(tokens):
     sentence = tokens
     remove_list=LireFichier('short_stop_word.html')
@@ -133,6 +138,7 @@ def StopList(tokens):
 
     return res
 
+#Calcul de la frequence de chaque terme dans un texte et stockage de ces derniers dans une liste inverse
 def TermFrequency(tokens,ListesInverse,filename):
     ListesInverse=ListesInverse    
     diffwordcount=0
@@ -149,6 +155,7 @@ def TermFrequency(tokens,ListesInverse,filename):
     print "Term frequency done for "+filename+" Diffwords : "+str(diffwordcount)
     return ListesInverse
 
+#Calcul de l'IDF pour chaque mot de la liste inverse
 def InverseDocumentFrequency(ListesInverse, DocCount):
     ListesInverse=ListesInverse
     Word2IDF = {}
@@ -157,6 +164,7 @@ def InverseDocumentFrequency(ListesInverse, DocCount):
     print "Inverse document frequency done"
     return Word2IDF
 
+#Calcul de la norme pour chaque mot d'un fichier
 def Norme(ListesInverse,Word2IDF,useIDF):
     File2Norme={}
     for word in ListesInverse:
